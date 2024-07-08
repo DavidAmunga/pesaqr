@@ -9,6 +9,7 @@ import { AppContext, AppContextType } from "@/context/AppContext";
 import InstallButton from "../InstallButton";
 import NumPad from "../NumPad";
 import PaymentDetails from "../PaymentDetails";
+import { FaGithub } from "react-icons/fa";
 
 const HomeUI = () => {
   const { data } = useContext(AppContext) as AppContextType;
@@ -74,10 +75,19 @@ const HomeUI = () => {
                     </div>
                   </div>
                 </Link>
+                <div className="flex items-center space-x-2 justify-end">
+                  <Link
+                    href="https://github.com/DavidAmunga/pesaqr"
+                    target="_blank"
+                    className="text-white"
+                  >
+                    <FaGithub size={20} />
+                  </Link>
 
-                {showInstallBtn && (
-                  <InstallButton handleInstall={handleInstallClick} />
-                )}
+                  {showInstallBtn && (
+                    <InstallButton handleInstall={handleInstallClick} />
+                  )}
+                </div>
               </div>
 
               {/* Form */}
