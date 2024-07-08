@@ -1,0 +1,27 @@
+[
+  {
+    "name": "KPLC PREPAID",
+    "paybillNumber": "888880",
+    "color": "#1D4A8A"
+  },
+  {
+    "name": "ZUKU FIBER",
+    "paybillNumber": "320320",
+    "color": "#4A6738"
+  },
+  {
+    "name": "SAFARICOM HOME",
+    "paybillNumber": "150501",
+    "color": "#4A6738"
+  },
+  {
+    "name": "NAIROBI WATER",
+    "paybillNumber": "444400",
+    "color": "#1203E2"
+  },
+  {
+    "name": "EQUITY BANK",
+    "paybillNumber": "444400",
+    "color": "#92322E"
+  }
+]
