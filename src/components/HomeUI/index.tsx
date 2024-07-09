@@ -76,8 +76,7 @@ const HomeUI = () => {
                     </div>
                   </div>
                 </Link>
-                <div className="flex items-center space-x-2 justify-end">
-                  <ColorPicker />
+                <div className="flex items-center space-x-3 justify-end">
                   <Link
                     href="https://github.com/DavidAmunga/pesaqr"
                     target="_blank"
@@ -85,6 +84,8 @@ const HomeUI = () => {
                   >
                     <FaGithub size={20} />
                   </Link>
+
+                  <ColorPicker />
 
                   {showInstallBtn && (
                     <InstallButton handleInstall={handleInstallClick} />
