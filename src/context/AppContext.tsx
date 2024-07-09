@@ -18,6 +18,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode[] }) => {
   });
   const [db, saveDb, clearDb] = useLocalStorage<FormData>(PESAQR_DB, {
     type: TRANSACTION_TYPE.TILL_NUMBER,
+    color: colors.green[600],
   });
 
   // Load Data from DB
