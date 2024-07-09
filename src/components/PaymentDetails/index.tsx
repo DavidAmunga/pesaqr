@@ -27,7 +27,7 @@ const PaymentDetails = () => {
           </TabsList>
         </Tabs>
         <Input
-          className="text-3xl bg-green-600 text-white py-1 text-center rounded-none border-none font-bold font-display placeholder:text-white"
+          className="text-xl md:text-3xl bg-green-600 text-white py-1 text-center rounded-none border-none font-bold font-display placeholder:text-white"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setData({ ...data, name: e.target.value.toUpperCase() });
           }}
@@ -38,7 +38,7 @@ const PaymentDetails = () => {
         <div className="flex flex-col h-full space-y-1 border-none bg-white">
           {data.type === TRANSACTION_TYPE.TILL_NUMBER && (
             <>
-              <p className="text-green-600 font-display text-center py-1  text-3xl">
+              <p className="text-green-600 font-display text-center py-1  text-xl md:text-3xl">
                 TILL NUMBER
               </p>
               <div className="flex mx-auto items-center space-x-4 flex-wrap w-full justify-center ">
@@ -57,14 +57,14 @@ const PaymentDetails = () => {
                   allowNegative={false}
                   allowLeadingZeros={true}
                   placeholder="Enter Till Number"
-                  className=" py-2 md:py-4 tracking-widest mx-auto w-full border-none bg-transparent  text-center  font-display text-3xl   text-gray-900 rounded-none  "
+                  className=" py-2 md:py-4 tracking-widest mx-auto w-full border-none bg-transparent  text-center  font-display text-xl md:text-3xl   text-gray-900 rounded-none  "
                 />
               </div>
             </>
           )}
           {data.type === TRANSACTION_TYPE.PAYBILL && (
             <>
-              <p className="text-green-600 font-display text-center  text-3xl">
+              <p className="text-green-600 font-display text-center  text-xl md:text-3xl">
                 PAYBILL NUMBER
               </p>
               <div className="flex mx-auto items-center space-x-4 flex-wrap w-full justify-center ">
@@ -83,10 +83,10 @@ const PaymentDetails = () => {
                   allowNegative={false}
                   allowLeadingZeros={true}
                   placeholder="Enter Paybill Number"
-                  className=" py-2 md:py-4 tracking-widest mx-auto w-full border-none bg-transparent  text-center  font-display text-3xl   text-gray-900 rounded-none  "
+                  className=" py-2 md:py-4 tracking-widest mx-auto w-full border-none bg-transparent  text-center  font-display text-xl md:text-3xl   text-gray-900 rounded-none  "
                 />
               </div>
-              <p className="text-green-600 font-display text-center text-3xl">
+              <p className="text-green-600 font-display text-center text-xl md:text-3xl">
                 ACCOUNT NUMBER
               </p>
               <Input
@@ -95,7 +95,7 @@ const PaymentDetails = () => {
                 }}
                 value={data.accountNumber}
                 placeholder="Enter Account Number"
-                className="rounded-none py-2 md:py-4 tracking-widest mx-auto w-full border-none  text-center bg-white font-display text-3xl   text-gray-900  "
+                className="rounded-none py-2 md:py-4 tracking-widest mx-auto w-full border-none  text-center bg-white font-display text-xl md:text-3xl   text-gray-900  "
               />
             </>
           )}

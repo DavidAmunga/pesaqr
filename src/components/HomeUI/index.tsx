@@ -69,9 +69,9 @@ const HomeUI = () => {
                   href="/"
                   className="cursor-pointer flex w-fit justify-center md:justify-start  md:h-fit items-center space-x-2"
                 >
-                  <img src="/logo.svg" className="size-12 md:size-13" />
+                  <img src="/logo.svg" className="size-8 md:size-13" />
                   <div className="flex flex-col space-y-1">
-                    <div className="font-display font-bold  text-3xl md:text-5xl items-center flex text-white">
+                    <div className="font-display font-bold  text-2xl md:text-5xl items-center flex text-white">
                       <span>PESAQR.COM</span>{" "}
                     </div>
                   </div>
@@ -101,8 +101,8 @@ const HomeUI = () => {
               style={{ background: data.color }}
               className={`relative h-full flex flex-col md:w-full w-11/12 rounded-md md:rounded-none mx-auto justify-start md:justify-center items-center`}
             >
-              <div className="flex flex-col space-y-5 md:space-y-4 items-center w-4/5">
-                <div className="py-4 flex items-center select-none w-4/5 bg-black border-2 border-gray-800 px-4 rounded-md shadow-inner text-center text-white font-display  md:text-4xl">
+              <div className="flex flex-col space-y-5 md:space-y-4 items-center md:w-4/5">
+                <div className="py-4 flex items-center select-none w-full md:w-4/5 bg-black border-2 border-gray-800 px-4 rounded-md shadow-inner text-center text-white font-display  md:text-4xl">
                   <div className="border-2 border-gray-700 size-4 rounded-full bg-white"></div>
                   <Input
                     onChange={(e) => {
