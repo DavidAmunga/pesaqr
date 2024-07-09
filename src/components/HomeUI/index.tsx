@@ -99,7 +99,7 @@ const HomeUI = () => {
             </div>
             <div
               style={{ background: data.color }}
-              className={`relative  h-full flex flex-col justify-start md:justify-center items-center`}
+              className={`relative h-full flex flex-col md:w-full w-11/12 rounded-md md:rounded-none mx-auto justify-start md:justify-center items-center`}
             >
               <div className="flex flex-col space-y-5 md:space-y-4 items-center w-4/5">
                 <div className="py-4 flex items-center select-none w-4/5 bg-black border-2 border-gray-800 px-4 rounded-md shadow-inner text-center text-white font-display  md:text-4xl">
@@ -145,7 +145,7 @@ const HomeUI = () => {
             </div>
           </div>
         </main>
-        <footer className="text-center py-4 font-display text-white">
+        <footer className="text-center py-2 font-display text-white">
           Built in 🇰🇪 by
           <Link
             href="https://twitter.com/davidamunga_"
