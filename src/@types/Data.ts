@@ -11,6 +11,8 @@ export interface Data {
   amount: string;
   type: TRANSACTION_TYPE;
   code: string;
+  bannerText: string;
+  color: string;
 }
 
 export type FormData = Partial<Data>;

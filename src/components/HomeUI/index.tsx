@@ -10,9 +10,11 @@ import InstallButton from "../InstallButton";
 import NumPad from "../NumPad";
 import PaymentDetails from "../PaymentDetails";
 import { FaGithub } from "react-icons/fa";
+import { Input } from "../ui/input";
+import { ColorPicker } from "../ColorPicker";
 
 const HomeUI = () => {
-  const { data } = useContext(AppContext) as AppContextType;
+  const { data, setData } = useContext(AppContext) as AppContextType;
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallBtn, setShowInstallBtn] = useState<boolean>(false);
@@ -71,11 +73,11 @@ const HomeUI = () => {
                   <div className="flex flex-col space-y-1">
                     <div className="font-display font-bold  text-3xl md:text-5xl items-center flex text-white">
                       <span>PESAQR.COM</span>{" "}
-                      {/* <span className="text-sm">-pay via qr code</span> */}
                     </div>
                   </div>
                 </Link>
                 <div className="flex items-center space-x-2 justify-end">
+                  <ColorPicker />
                   <Link
                     href="https://github.com/DavidAmunga/pesaqr"
                     target="_blank"
@@ -94,11 +96,25 @@ const HomeUI = () => {
               <PaymentDetails />
               <NumPad />
             </div>
-            <div className="relative  bg-green-600 h-full flex flex-col justify-start md:justify-center items-center">
+            <div
+              style={{ background: data.color }}
+              className={`relative  h-full flex flex-col justify-start md:justify-center items-center`}
+            >
               <div className="flex flex-col space-y-5 md:space-y-4 items-center w-4/5">
                 <div className="py-4 flex items-center select-none w-4/5 bg-black border-2 border-gray-800 px-4 rounded-md shadow-inner text-center text-white font-display  md:text-4xl">
                   <div className="border-2 border-gray-700 size-4 rounded-full bg-white"></div>
-                  <span className="flex-1 ">SCAN WITH M-PESA</span>
+                  <Input
+                    onChange={(e) => {
+                      setData({ ...data, bannerText: e.target.value });
+                    }}
+                    value={
+                      data.bannerText && data.bannerText.length > 0
+                        ? data.bannerText
+                        : "SCAN WITH M-PESA"
+                    }
+                    placeholder="Enter Banner Text"
+                    className="flex-1 px-0 rounded-none  tracking-widest mx-auto w-full border-none  text-center bg-transparent text-white font-display text-xl md:text-4xl "
+                  />
                   <div className="border-2 border-gray-700 size-4 rounded-full bg-white"></div>
                 </div>
                 <div className="w-full justify-center  flex items-center flex-col rounded-lg">
