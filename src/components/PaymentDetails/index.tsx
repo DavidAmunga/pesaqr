@@ -16,7 +16,7 @@ const PaymentDetails = () => {
           value={data.type}
           className="w-full flex flex-col"
           onValueChange={(value) =>
-            setData({ name: data.name, type: value as TRANSACTION_TYPE })
+            setData({ ...data, type: value as TRANSACTION_TYPE })
           }
         >
           <TabsList className="w-full grid  gap-2 place-content-center py-6 justify-center grid-cols-2 ">
