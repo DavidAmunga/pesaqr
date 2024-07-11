@@ -4,6 +4,7 @@ import { AppContext, AppContextType } from "@/context/AppContext";
 import { NumericFormat } from "react-number-format";
 import { Input } from "../ui/input";
 import { FiDelete } from "react-icons/fi";
+import { TRANSACTION_TYPE } from "@/@types/TransactionType";
 
 const NumPad = () => {
   const { data, setData } = useContext(AppContext) as AppContextType;
@@ -39,8 +40,11 @@ const NumPad = () => {
         thousandSeparator=","
         prefix="KES "
         allowNegative={false}
-        placeholder="Enter Amount to Pay"
-        className="font-display py-7 md:py-7 border-4 border-green-600  shadow-inner placeholder:text-xl  placeholder:md:text-3xl  placeholder:text-gray-600 text-gray-900 text-xl md:text-4xl text-center w-full"
+        placeholder={`Enter Amount ${
+          data.type === TRANSACTION_TYPE.AGENT ? "to withdraw" : "to pay"
+        } `}
+        style={{ borderColor: data.color }}
+        className="font-display py-7 md:py-7 border-4   shadow-inner placeholder:text-xl  placeholder:md:text-3xl  placeholder:text-gray-600 text-gray-900 text-xl md:text-4xl text-center w-full"
       />
       <div className="w-full grid grid-cols-3 gap-1">
         <Button
