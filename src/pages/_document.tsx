@@ -21,13 +21,7 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          {process.env.NODE_ENV === "production" && (
-           <Script
-           defer
-           data-domain="pesaqr.com"
-           src="https://analytics.davidamunga.com/js/script.js"
-         />
-          )}
+        
           <link rel="manifest" href="/manifest.json" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           <meta name="theme-color" content="#121826" />
