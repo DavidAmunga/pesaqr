@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import QrSvg from "@wojtekmaj/react-qr-svg";
 import Head from "next/head";
 import HomeSEO from "@/components/HomeSEO";
@@ -12,6 +12,9 @@ import PaymentDetails from "../PaymentDetails";
 import { FaGithub } from "react-icons/fa";
 import { Input } from "../ui/input";
 import { ColorPicker } from "../ColorPicker";
+import { Button } from "../ui/button";
+import { HiOutlineDownload } from "react-icons/hi";
+import { TRANSACTION_TYPE } from "@/@types/TransactionType";
 
 const HomeUI = () => {
   const { data, setData } = useContext(AppContext) as AppContextType;
@@ -53,6 +56,63 @@ const HomeUI = () => {
     });
   };
 
+  const handleQRCodeDownload = () => {
+    const svgElement = document.querySelector('.p-8.border-\\[12px\\]');
+    if (svgElement) {
+      // Create a canvas element
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Convert SVG to string
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(svgBlob);
+      
+      // Create image from SVG
+      const img = new Image();
+      img.onload = () => {
+        // Set canvas size to match image
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Draw image to canvas
+        ctx?.drawImage(img, 0, 0);
+        
+        // Convert canvas to PNG
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const pngUrl = URL.createObjectURL(blob);
+            
+            // Generate filename based on payment type
+            let filename = 'pesaqr_';
+            if (data.type === TRANSACTION_TYPE.PAYBILL) {
+              filename += `${data.paybillNumber}_${data.accountNumber}_${data.amount}`;
+            } else if (data.type == TRANSACTION_TYPE.TILL_NUMBER) {
+              filename += `${data.tillNumber}_${data.amount}`;
+            } else if (data.type == TRANSACTION_TYPE.AGENT) {
+              filename += `${data.agentNumber}_${data.storeNumber}_${data.amount}`;
+            }
+            filename += '.png';
+  
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = pngUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+  
+            // Clean up
+            document.body.removeChild(link);
+            URL.revokeObjectURL(pngUrl);
+          }
+        }, 'image/png');
+        
+        // Clean up original SVG URL
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
+  };
   return (
     <>
       <Head>
@@ -95,7 +155,7 @@ const HomeUI = () => {
 
               {/* Form */}
               <PaymentDetails />
-              <NumPad />
+              {!data.hideAmount ? <NumPad /> : null}
             </div>
             <div
               style={{ background: data.color }}
@@ -123,6 +183,15 @@ const HomeUI = () => {
                     value={generateQRCode(data) ?? ""}
                     className="p-8 border-[12px] border-black  md:w-5/6 bg-white rounded-md"
                   />
+                  <Button
+                    onClick={handleQRCodeDownload}
+                    type="button"
+                    className="mt-4 py-8  text-xl md:text-4xl w-full md:w-4/5 bg-black flex space-x-2 items-center  hover:bg-gray-900"
+                  >
+
+                    <HiOutlineDownload className="size-8" />
+                    <span className="py-4">Download</span>
+                  </Button>
                 </div>
                 {/* TODO: Add this later */}
                 {/* <div className="flex w-4/5 justify-center items-center space-x-4 ">

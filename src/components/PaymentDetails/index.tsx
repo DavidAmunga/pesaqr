@@ -4,6 +4,7 @@ import React, { useContext } from "react";
 import { Input } from "../ui/input";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import classNames from "classnames";
+import { Checkbox } from "../ui/checkbox";
 import { NumericFormat } from "react-number-format";
 
 const PaymentDetails = () => {
@@ -164,6 +165,23 @@ const PaymentDetails = () => {
               />
             </>
           )}
+          {/* {data.type != TRANSACTION_TYPE.PAYBILL && (
+            <div className="flex items-center px-4 py-2  space-x-2">
+              <Checkbox
+                id="hideAmount"
+                checked={data.hideAmount}
+                onCheckedChange={(checked) =>
+                  setData({ ...data, hideAmount: checked ? true : false })
+                }
+              />
+              <label
+                htmlFor="hideAmount"
+                className="text-sm font-medium leading-none text-gray-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Hide amount
+              </label>
+            </div>
+          )} */}
         </div>
       </div>
     </div>
