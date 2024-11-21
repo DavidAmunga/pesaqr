@@ -186,7 +186,7 @@ const HomeUI = () => {
                   <Button
                     onClick={handleQRCodeDownload}
                     type="button"
-                    className="mt-4 py-8  text-xl md:text-4xl w-full md:w-4/5 bg-black flex space-x-2 items-center  hover:bg-gray-900"
+                    className="plausible-event-name=QR+Download mt-4 py-8  text-xl md:text-4xl w-full md:w-4/5 bg-black flex space-x-2 items-center  hover:bg-gray-900"
                   >
 
                     <HiOutlineDownload className="size-8" />
