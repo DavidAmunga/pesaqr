@@ -165,7 +165,7 @@ const PaymentDetails = () => {
               />
             </>
           )}
-          {/* {data.type != TRANSACTION_TYPE.PAYBILL && (
+          {data.type == TRANSACTION_TYPE.TILL_NUMBER && (
             <div className="flex items-center px-4 py-2  space-x-2">
               <Checkbox
                 id="hideAmount"
@@ -181,7 +181,7 @@ const PaymentDetails = () => {
                 Hide amount
               </label>
             </div>
-          )} */}
+            )} 
         </div>
       </div>
     </div>

@@ -11,16 +11,14 @@ export const generateQRCode = (data: FormData): string | null => {
     paybillNumber,
   } = data;
 
-
   switch (data.type) {
     case TRANSACTION_TYPE.TILL_NUMBER:
       return `BG|${tillNumber}${data.hideAmount ? `` : `|${amount}`}`;
     case TRANSACTION_TYPE.PAYBILL:
-      return `PB|${paybillNumber}|${amount}|${accountNumber}`;
+      const paybill = `PB|${paybillNumber}|${amount}|${accountNumber}`;
+      return paybill;
     case TRANSACTION_TYPE.AGENT:
-      return `WA|${agentNumber}${
-        data.hideAmount ? `` : `|${amount}`
-      }|${storeNumber}`;
+      return `WA|${agentNumber}|${amount}|${storeNumber}`;
     default:
       return null;
   }
