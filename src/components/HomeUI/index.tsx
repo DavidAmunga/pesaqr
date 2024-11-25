@@ -13,7 +13,7 @@ import { FaGithub } from "react-icons/fa";
 import { Input } from "../ui/input";
 import { ColorPicker } from "../ColorPicker";
 import { Button } from "../ui/button";
-import { HiOutlineDownload } from "react-icons/hi";
+import { HiOutlineDownload, HiOutlineShare  } from "react-icons/hi";
 import { TRANSACTION_TYPE } from "@/@types/TransactionType";
 
 const HomeUI = () => {
@@ -58,60 +58,86 @@ const HomeUI = () => {
 
   const handleQRCodeDownload = () => {
     const svgElement = document.querySelector('.p-8.border-\\[12px\\]');
-    if (svgElement) {
-      // Create a canvas element
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      // Convert SVG to string
-      const svgData = new XMLSerializer().serializeToString(svgElement);
-      const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(svgBlob);
-      
-      // Create image from SVG
-      const img = new Image();
-      img.onload = () => {
-        // Set canvas size to match image
-        canvas.width = img.width;
-        canvas.height = img.height;
-        
-        // Draw image to canvas
-        ctx?.drawImage(img, 0, 0);
-        
-        // Convert canvas to PNG
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const pngUrl = URL.createObjectURL(blob);
-            
-            // Generate filename based on payment type
-            let filename = 'pesaqr_';
-            if (data.type === TRANSACTION_TYPE.PAYBILL) {
-              filename += `${data.paybillNumber}_${data.accountNumber}_${data.amount}`;
-            } else if (data.type == TRANSACTION_TYPE.TILL_NUMBER) {
-              filename += `${data.tillNumber}_${data.amount}`;
-            } else if (data.type == TRANSACTION_TYPE.AGENT) {
-              filename += `${data.agentNumber}_${data.storeNumber}_${data.amount}`;
-            }
-            filename += '.png';
+    if (!svgElement) return;
   
-            // Create temporary link and trigger download
-            const link = document.createElement('a');
-            link.href = pngUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-  
-            // Clean up
+    // Get the SVG dimensions
+    const svgRect = svgElement.getBoundingClientRect();
+    
+    // Create a canvas element
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set explicit dimensions for the canvas
+    canvas.width = svgRect.width;
+    canvas.height = svgRect.height;
+    
+    // Convert SVG to string with explicit XML declaration and dimensions
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgString = `<?xml version="1.0" encoding="UTF-8"?>
+      <svg xmlns="http://www.w3.org/2000/svg" width="${svgRect.width}" height="${svgRect.height}">
+        ${svgData}
+      </svg>`;
+    
+    // Create blob with proper XML encoding
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    
+    // Create image from SVG
+    const img = new Image();
+    
+    // Important: Set these attributes for Firefox security policy
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+      // Fill canvas with white background first
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw image to canvas
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      
+      // Convert canvas to PNG with proper MIME type
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const pngUrl = URL.createObjectURL(blob);
+          
+          // Generate filename based on payment type
+          let filename = 'pesaqr_';
+          if (data.type === TRANSACTION_TYPE.PAYBILL) {
+            filename += `${data.paybillNumber}_${data.accountNumber}_${data.amount}`;
+          } else if (data.type === TRANSACTION_TYPE.TILL_NUMBER) {
+            filename += `${data.tillNumber}_${data.amount}`;
+          } else if (data.type === TRANSACTION_TYPE.AGENT) {
+            filename += `${data.agentNumber}_${data.storeNumber}_${data.amount}`;
+          }
+          filename += '.png';
+          
+          // Create and trigger download link
+          const link = document.createElement('a');
+          link.href = pngUrl;
+          link.download = filename;
+          
+          // Firefox requires the link to be in the document
+          document.body.appendChild(link);
+          link.click();
+          
+          // Cleanup after a short delay to ensure download starts
+          setTimeout(() => {
             document.body.removeChild(link);
             URL.revokeObjectURL(pngUrl);
-          }
-        }, 'image/png');
-        
-        // Clean up original SVG URL
-        URL.revokeObjectURL(url);
-      };
-      img.src = url;
-    }
+            URL.revokeObjectURL(url);
+          }, 100);
+        }
+      }, 'image/png', 1.0); // Added quality parameter
+    };
+    
+    // Add error handling
+    img.onerror = (error) => {
+      console.error('Error loading SVG:', error);
+      URL.revokeObjectURL(url);
+    };
+    
+    img.src = url;
   };
   return (
     <>
@@ -194,22 +220,23 @@ const HomeUI = () => {
                   </Button>
                 </div>
                 {/* TODO: Add this later */}
-                {/* <div className="flex w-4/5 justify-center items-center space-x-4 ">
+                <div className="flex w-4/5 justify-center items-center space-x-4 ">
+                 {/*
                   <Button
                     type="button"
                     className="bg-gray-900 w-full flex space-x-2 items-center text-xl md:text-3xl py-7 hover:bg-gray-700"
                   >
                     <span>Download</span>
-                    <HiOutlineDocumentDownload />
-                  </Button>
-                  <Button
+                    <HiOutlineDownload />
+                  </Button> */}
+                  {/* <Button
                     type="button"
                     className="bg-blue-600  w-full flex space-x-2 items-center  text-xl md:text-3xl py-7 hover:bg-blue-500 "
                   >
                     <span>Share</span>
                     <HiOutlineShare />
-                  </Button>
-                </div> */}
+                  </Button> */}
+                </div>
               </div>
             </div>
           </div>
