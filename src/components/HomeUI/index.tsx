@@ -21,6 +21,7 @@ const HomeUI = () => {
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallBtn, setShowInstallBtn] = useState<boolean>(false);
+  const [isShareSupported, setIsShareSupported] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -39,6 +40,8 @@ const HomeUI = () => {
         handleBeforeInstallPrompt
       );
     };
+
+    setIsShareSupported(checkWebShareSupport());
   }, []);
   const handleInstallClick = () => {
     // Hide the install button
@@ -139,6 +142,120 @@ const HomeUI = () => {
     
     img.src = url;
   };
+
+  const checkWebShareSupport = () => {
+    return navigator.share !== undefined && navigator.canShare !== undefined;
+  };
+
+  useEffect(() => {
+    setIsShareSupported(checkWebShareSupport());
+  }, []);
+
+  const handleQRCodeShare = async () => {
+    const svgElement = document.querySelector('.p-8.border-\\[12px\\]');
+    if (!svgElement) return;
+  
+    try {
+      // Get the SVG dimensions
+      const svgRect = svgElement.getBoundingClientRect();
+      
+      // Create a canvas element
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Set canvas dimensions
+      canvas.width = svgRect.width;
+      canvas.height = svgRect.height;
+      
+      // Convert SVG to string with proper XML declaration
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const svgString = `<?xml version="1.0" encoding="UTF-8"?>
+        <svg xmlns="http://www.w3.org/2000/svg" width="${svgRect.width}" height="${svgRect.height}">
+          ${svgData}
+        </svg>`;
+      
+      // Create blob with proper encoding
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      
+      // Create image from SVG
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      // Convert to shareable file
+      const sharePromise = new Promise((resolve, reject) => {
+        img.onload = () => {
+          // Fill canvas with white background
+          ctx.fillStyle = 'white';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Draw image to canvas
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // Convert canvas to blob
+          canvas.toBlob((blob) => {
+            if (blob) {
+              // Generate filename
+              let filename = 'pesaqr_';
+              if (data.type === TRANSACTION_TYPE.PAYBILL) {
+                filename += `${data.paybillNumber}_${data.accountNumber}_${data.amount}`;
+              } else if (data.type === TRANSACTION_TYPE.TILL_NUMBER) {
+                filename += `${data.tillNumber}_${data.amount}`;
+              } else if (data.type === TRANSACTION_TYPE.AGENT) {
+                filename += `${data.agentNumber}_${data.storeNumber}_${data.amount}`;
+              }
+              filename += '.png';
+              
+              // Create file object for sharing
+              const file = new File([blob], filename, { type: 'image/png' });
+              resolve(file);
+            } else {
+              reject(new Error('Failed to create image blob'));
+            }
+          }, 'image/png', 1.0);
+        };
+        
+        img.onerror = () => reject(new Error('Failed to load image'));
+      });
+      
+      img.src = url;
+      
+      // Wait for file creation
+      const shareFile = await sharePromise;
+      
+      // Prepare share data
+      const shareData = {
+        title: 'PesaQR Code',
+        text: 'Scan this QR code to make a payment',
+        files: [shareFile]
+      };
+      
+      // Check if sharing files is supported
+      if (navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to sharing without files if file sharing is not supported
+        const textOnlyShareData = {
+          title: shareData.title,
+          text: shareData.text,
+        };
+        
+        if (navigator.canShare(textOnlyShareData)) {
+          await navigator.share(textOnlyShareData);
+        } else {
+          throw new Error('Web Share not supported');
+        }
+      }
+      
+      // Cleanup
+      URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Error sharing QR code:', error);
+      // Handle error appropriately (e.g., show toast message)
+    }
+  };
+
   return (
     <>
       <Head>
@@ -229,13 +346,19 @@ const HomeUI = () => {
                     <span>Download</span>
                     <HiOutlineDownload />
                   </Button> */}
-                  {/* <Button
+                  <Button
                     type="button"
-                    className="bg-blue-600  w-full flex space-x-2 items-center  text-xl md:text-3xl py-7 hover:bg-blue-500 "
+                    onClick={handleQRCodeShare}
+                    disabled={!isShareSupported}
+                    className={`plausible-event-name=QR+Share mt-4 py-8 text-xl md:text-4xl w-full md:w-4/5 flex items-center justify-center space-x-2 ${
+                      isShareSupported 
+                        ? 'bg-black hover:bg-gray-900 text-white' 
+                        : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    }`}
                   >
-                    <span>Share</span>
-                    <HiOutlineShare />
-                  </Button> */}
+                    <span>Share QR Code</span>
+                    <HiOutlineShare className="size-8" />
+                  </Button>
                 </div>
               </div>
             </div>
