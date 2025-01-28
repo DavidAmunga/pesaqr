@@ -1,22 +1,24 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, PropertyValues } from "lit";
+import { customElement, property } from "lit/decorators.js";
 import qrcode from "qrcode-generator";
 
 const TRANSACTION_TYPE = {
   TILL_NUMBER: "till",
   PAYBILL: "paybill",
   SEND_MONEY: "phone",
-};
+} as const;
 
+type TransactionType = typeof TRANSACTION_TYPE[keyof typeof TRANSACTION_TYPE];
+
+@customElement("pesa-qr")
 export class PesaQR extends LitElement {
-  static properties = {
-    type: { type: String }, // till, paybill, or phone
-    tillNumber: { type: String },
-    paybillNumber: { type: String },
-    accountNumber: { type: String },
-    phoneNumber: { type: String },
-    amount: { type: String },
-    width: { type: Number },
-  };
+  @property({ type: String }) type: TransactionType = "till";
+  @property({ type: String }) tillNumber = "";
+  @property({ type: String }) paybillNumber = "";
+  @property({ type: String }) accountNumber = "";
+  @property({ type: String }) phoneNumber = "";
+  @property({ type: String }) amount = "";
+  @property({ type: Number }) width: number | null = null;
 
   static styles = css`
     :host {
@@ -70,7 +72,7 @@ export class PesaQR extends LitElement {
 
   constructor() {
     super();
-    this.type = "";
+    this.type = "till";
     this.tillNumber = "";
     this.paybillNumber = "";
     this.accountNumber = "";
@@ -88,7 +90,7 @@ export class PesaQR extends LitElement {
     `;
   }
 
-  updated(changedProperties) {
+  updated(changedProperties: PropertyValues): void {
     if (
       changedProperties.has("type") ||
       changedProperties.has("tillNumber") ||
@@ -135,10 +137,16 @@ export class PesaQR extends LitElement {
       qr.addData(qrData);
       qr.make();
 
-      const qrCodeContainer = this.shadowRoot.getElementById("qrcode");
-      qrCodeContainer.innerHTML = qr.createImgTag(20);
+      const qrCodeContainer = this.shadowRoot?.getElementById("qrcode");
+      if (qrCodeContainer) {
+        qrCodeContainer.innerHTML = qr.createImgTag(20);
+      }
     }
   }
 }
 
-customElements.define("pesa-qr", PesaQR);
+declare global {
+  interface HTMLElementTagNameMap {
+    'pesa-qr': PesaQR;
+  }
+}

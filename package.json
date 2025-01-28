@@ -1,6 +1,6 @@
 {
   "name": "pesaqr",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "QR Code Banner to scan and pay M-PESA for any Till/Paybill Number via the M-PESA app",
   "keywords": [
     "M-PESA",
@@ -15,17 +15,31 @@
   },
   "author": "David Amunga <david@davidamunga.com>",
   "license": "MIT",
-  "main": "src/pesaqr.js",
+  "main": "./dist/pesaqr.js",
+  "module": "./dist/pesaqr.js",
   "dependencies": {
-    "lit": "^3.2.0",
+    "lit": "^3.2.1",
     "qrcode-generator": "^1.4.4",
     "vite": "^5.4.8"
   },
+  "types": "./dist/pesaqr.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/pesaqr.js",
+      "types": "./dist/pesaqr.d.ts"
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "tsc && vite build",
+    "prepare": "npm run build"
   },
   "devDependencies": {
-    "@webcomponents/webcomponentsjs": "^2.8.0"
+    "@types/qrcode-generator": "^0.0.16",
+    "@webcomponents/webcomponentsjs": "^2.8.0",
+    "typescript": "^5.7.3"
   }
 }
