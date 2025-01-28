@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PesaQR Demo</title>
+    <script type="module" src="/src/pesaqr.js"></script>
+    <style>
+      .qr-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+      }
+      .qr-item {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="qr-container">
+      <div class="qr-item">
+        <h3>Till Payment</h3>
+        <pesa-qr
+          type="till"
+          tillNumber="8119170"
+          amount="100"
+          width="700"
+        ></pesa-qr>
+      </div>
+      <div class="qr-item">
+        <h3>Paybill Payment</h3>
+        <pesa-qr
+          type="paybill"
+          paybillNumber="888880"
+          accountNumber="YOURACCOUNTNUMBER"
+          amount="100"
+          width="700"
+        ></pesa-qr>
+      </div>
+      <div class="qr-item">
+        <h3>Phone Payment</h3>
+        <pesa-qr
+          type="phone"
+          phoneNumber="0712345678"
+          amount="100"
+          width="700"
+        ></pesa-qr>
+      </div>
+    </div>
+  </body>
+</html>
