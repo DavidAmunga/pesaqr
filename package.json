@@ -9,6 +9,10 @@
     "Till",
     "Payment"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DavidAmunga/pesaqr.git"
+  },
   "author": "David Amunga <david@davidamunga.com>",
   "license": "MIT",
   "main": "src/pesaqr.js",
