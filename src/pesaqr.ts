@@ -8,7 +8,24 @@ const TRANSACTION_TYPE = {
   SEND_MONEY: "phone",
 } as const;
 
-type TransactionType = typeof TRANSACTION_TYPE[keyof typeof TRANSACTION_TYPE];
+type TransactionType = (typeof TRANSACTION_TYPE)[keyof typeof TRANSACTION_TYPE];
+
+export interface PesaQRProps {
+  /** Type of payment: till, paybill, or phone */
+  type: "till" | "paybill" | "phone";
+  /** Till number for till payments */
+  tillNumber?: string;
+  /** Paybill number for paybill payments */
+  paybillNumber?: string;
+  /** Account number for paybill payments */
+  accountNumber?: string;
+  /** Phone number for send money payments */
+  phoneNumber?: string;
+  /** Payment amount */
+  amount: string;
+  /** QR code width in pixels */
+  width?: number;
+}
 
 @customElement("pesa-qr")
 export class PesaQR extends LitElement {
@@ -19,6 +36,9 @@ export class PesaQR extends LitElement {
   @property({ type: String }) phoneNumber = "";
   @property({ type: String }) amount = "";
   @property({ type: Number }) width: number | null = null;
+  @property({ type: String }) theme: "light" | "dark" = "light";
+  @property({ type: Boolean }) loading = false;
+  @property({ type: String }) error: string | null = null;
 
   static styles = css`
     :host {
@@ -28,15 +48,29 @@ export class PesaQR extends LitElement {
       --header-padding: calc(var(--qr-size) * 0.025);
       --border-radius: calc(var(--qr-size) * 0.05);
       --font-size: calc(var(--qr-size) * 0.05);
+
+      /* Theme Variables */
+      --qr-primary-color: var(--pesaqr-primary-color, #16a34a);
+      --qr-background: var(--pesaqr-background, white);
+      --qr-text-color: var(--pesaqr-text-color, white);
+      --qr-border-color: var(--pesaqr-border-color, #16a34a);
+    }
+
+    /* Dark theme */
+    :host([theme="dark"]) {
+      --qr-primary-color: var(--pesaqr-primary-color, #22c55e);
+      --qr-background: var(--pesaqr-background, #1f2937);
+      --qr-text-color: var(--pesaqr-text-color, #f3f4f6);
+      --qr-border-color: var(--pesaqr-border-color, #22c55e);
     }
 
     .pesaqr {
       position: relative;
-      border: calc(var(--qr-size) * 0.02) solid #16A34A;
+      border: calc(var(--qr-size) * 0.02) solid var(--qr-border-color);
       border-radius: var(--border-radius);
       overflow: visible;
       width: fit-content;
-      background: white;
+      background: var(--qr-background);
       margin-top: calc(var(--header-padding) * 2);
     }
 
@@ -45,8 +79,8 @@ export class PesaQR extends LitElement {
       top: 0;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #16A34A;
-      color: white;
+      background: var(--qr-primary-color);
+      color: var(--qr-text-color);
       padding: var(--header-padding) calc(var(--header-padding) * 2);
       text-align: center;
       user-select: none;
@@ -54,7 +88,7 @@ export class PesaQR extends LitElement {
       border-radius: calc(var(--border-radius) * 0.35);
       font-size: var(--font-size);
       white-space: nowrap;
-      border: calc(var(--qr-size) * 0.02) solid #16A34A;
+      border: calc(var(--qr-size) * 0.02) solid var(--qr-border-color);
     }
 
     #qrcode {
@@ -97,7 +131,7 @@ export class PesaQR extends LitElement {
       changedProperties.has("paybillNumber") ||
       changedProperties.has("accountNumber") ||
       changedProperties.has("phoneNumber") ||
-      changedProperties.has("amount") 
+      changedProperties.has("amount")
     ) {
       this.generateQRCode();
     }
@@ -147,6 +181,6 @@ export class PesaQR extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'pesa-qr': PesaQR;
+    "pesa-qr": PesaQR;
   }
 }

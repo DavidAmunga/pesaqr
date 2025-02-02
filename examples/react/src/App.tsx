@@ -1,4 +1,5 @@
-import  PesaQR  from "pesaqr";
+import "pesaqr";
+
 function App() {
 
   return (
@@ -14,7 +15,7 @@ function App() {
         }}
       >
         <h1 style={{fontSize: "4rem", fontWeight: "bold"}}>PesaQR</h1>
-        <PesaQR type="till" tillNumber="123456" amount="100" width={900} />
+        <pesa-qr type="till" tillNumber="123456" amount="100" width={900} />
       </div>
     </>
   );

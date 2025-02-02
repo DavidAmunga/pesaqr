@@ -1,6 +1,6 @@
 {
   "name": "pesaqr",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "QR Code Banner to scan and pay M-PESA for any Till/Paybill Number via the M-PESA app",
   "keywords": [
     "M-PESA",
