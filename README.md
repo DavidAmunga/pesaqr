@@ -20,16 +20,21 @@ A lightweight, framework-agnostic library for generating M-PESA Payment QR codes
 npm install pesaqr
 ```
 
+## Examples
+
+Check out our example implementations:
+
+- [Angular Example](examples/angular)
+- [React Example](examples/react)
+- [Vue Example](examples/vue)
+
 ## Usage
 
 ### Basic HTML
 
 ```html
 <!-- Import the library -->
-<script
-  type="module"
-  src="node_modules/pesaqr/dist/pesaqr.mjs"
-></script>
+<script type="module" src="node_modules/pesaqr/dist/pesaqr.mjs"></script>
 
 <!-- Till Number Payment -->
 <pesa-qr type="till" tillNumber="123456" amount="100" width="300"></pesa-qr>
@@ -70,11 +75,11 @@ function App() {
 </template>
 
 <script>
-import "pesaqr";
+  import "pesaqr";
 
-export default {
-  name: "App",
-};
+  export default {
+    name: "App",
+  };
 </script>
 ```
 
@@ -82,39 +87,45 @@ export default {
 
 ```typescript
 // app.module.ts
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import 'pesaqr';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+import "pesaqr";
 
 @NgModule({
   // ...
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AppModule { }
+export class AppModule {}
 
-// component template
-<pesa-qr
-  type="till"
-  tillNumber="123456"
-  amount="100"
-  [width]="300"
-></pesa-qr>
+// app.component.ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "app-root",
+  template: `
+    <pesa-qr
+      type="till"
+      tillNumber="123456"
+      amount="100"
+      [width]="300"
+    ></pesa-qr>
+  `,
+})
+export class AppComponent {}
 ```
 
 ## API Reference
 
 ### Properties
 
-| Property      | Type    | Description                                 | Required                 |
-| ------------- | ------- | ------------------------------------------- | ------------------------ |
-| type          | string  | Payment type: "till", "paybill", or "phone" | Yes                      |
-| tillNumber    | string  | Till number for till payments               | Yes (for type="till")    |
-| paybillNumber | string  | Paybill number for paybill payments         | Yes (for type="paybill") |
-| accountNumber | string  | Account number for paybill payments         | Yes (for type="paybill") |
-| phoneNumber   | string  | Phone number for send money payments        | Yes (for type="phone")   |
-| amount        | string  | Payment amount                              | Yes                      |
-| width         | number  | QR code width in pixels                     | No (default: 600)        |
-
-
+| Property      | Type   | Description                                 | Required                 |
+| ------------- | ------ | ------------------------------------------- | ------------------------ |
+| type          | string | Payment type: "till", "paybill", or "phone" | Yes                      |
+| tillNumber    | string | Till number for till payments               | Yes (for type="till")    |
+| paybillNumber | string | Paybill number for paybill payments         | Yes (for type="paybill") |
+| accountNumber | string | Account number for paybill payments         | Yes (for type="paybill") |
+| phoneNumber   | string | Phone number for send money payments        | Yes (for type="phone")   |
+| amount        | string | Payment amount                              | Yes                      |
+| width         | number | QR code width in pixels                     | No (default: 600)        |
 
 ## Browser Support
 
