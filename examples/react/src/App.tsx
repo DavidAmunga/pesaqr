@@ -1,9 +1,5 @@
-import { useEffect } from "react";
-
+import  PesaQR  from "pesaqr";
 function App() {
-  useEffect(() => {
-    import("pesaqr");
-  }, []);
 
   return (
     <>
@@ -18,7 +14,7 @@ function App() {
         }}
       >
         <h1 style={{fontSize: "4rem", fontWeight: "bold"}}>PesaQR</h1>
-        <pesa-qr type="till" tillNumber="123456" amount="100" width={900} />
+        <PesaQR type="till" tillNumber="123456" amount="100" width={900} />
       </div>
     </>
   );

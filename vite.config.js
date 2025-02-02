@@ -4,7 +4,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: "src/pesaqr.ts",
-      formats: ["es"],
+      name: "pesaqr",
+      formats: ["es", "cjs"],
     },
     rollupOptions: {
       external: /^lit/,
