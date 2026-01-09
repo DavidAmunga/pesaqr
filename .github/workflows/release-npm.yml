@@ -1,0 +1,102 @@
+name: Release NPM Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        run: pnpm build
+
+      - name: Get package version
+        id: package-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Package version: $VERSION"
+
+      - name: Check if tag exists
+        id: check-tag
+        run: |
+          if git rev-parse "pesaqr@${{ steps.package-version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to NPM
+        if: steps.check-tag.outputs.exists == 'false'
+        run: pnpm publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Git tag
+        if: steps.check-tag.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "pesaqr@${{ steps.package-version.outputs.version }}" -m "Release pesaqr@${{ steps.package-version.outputs.version }}"
+          git push origin "pesaqr@${{ steps.package-version.outputs.version }}"
+
+      - name: Extract changelog
+        if: steps.check-tag.outputs.exists == 'false'
+        id: changelog
+        run: |
+          if [ -f "CHANGELOG.md" ]; then
+            # Extract the latest version's changelog
+            CHANGELOG=$(awk '/^## / {if (p) exit; p=1; next} p' CHANGELOG.md | sed '/^$/d')
+            if [ -z "$CHANGELOG" ]; then
+              CHANGELOG="Release version ${{ steps.package-version.outputs.version }}"
+            fi
+          else
+            CHANGELOG="Release version ${{ steps.package-version.outputs.version }}"
+          fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: steps.check-tag.outputs.exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: pesaqr@${{ steps.package-version.outputs.version }}
+          release_name: pesaqr@${{ steps.package-version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+      - name: Release already exists
+        if: steps.check-tag.outputs.exists == 'true'
+        run: |
+          echo "⚠️ Release pesaqr@${{ steps.package-version.outputs.version }} already exists"
+          echo "Please bump the version in package.json before releasing"
+          exit 1

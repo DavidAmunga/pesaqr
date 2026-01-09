@@ -1,0 +1,6 @@
+{
+  "name": "woocommerce-pesaqr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WooCommerce plugin for displaying M-PESA Payment QR codes"
+}

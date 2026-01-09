@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build NPM package
+        run: pnpm build
+
+      - name: Build WordPress plugin
+        run: pnpm build:wordpress
+
+      - name: Check for build artifacts
+        run: |
+          if [ ! -f "dist/pesaqr.js" ]; then
+            echo "❌ NPM build artifact not found"
+            exit 1
+          fi
+          if [ ! -f "dist/wordpress/pesaqr.mjs" ]; then
+            echo "❌ WordPress build artifact not found"
+            exit 1
+          fi
+          echo "✅ All build artifacts present"
+
+  changeset-check:
+    name: Changeset Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for changesets
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: echo "Checking for changesets..."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **No changeset found**\n\nThis PR doesn\'t include a changeset. If this PR includes changes that should be released, please add a changeset by running:\n\n```bash\npnpm changeset\n```\n\nIf this is a docs update or other change that doesn\'t need a release, you can ignore this message.'
+            })

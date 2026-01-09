@@ -1,0 +1,142 @@
+name: Release WordPress Plugin
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Build & Release WordPress Plugin
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build WordPress plugin
+        run: pnpm build:wordpress-plugin
+
+      - name: Get WordPress plugin version
+        id: plugin-version
+        run: |
+          VERSION=$(node -p "require('./woocommerce-pesaqr/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "WordPress plugin version: $VERSION"
+
+      - name: Check if tag exists
+        id: check-tag
+        run: |
+          if git rev-parse "wordpress@${{ steps.plugin-version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Verify plugin version in PHP file
+        if: steps.check-tag.outputs.exists == 'false'
+        run: |
+          PHP_VERSION=$(grep "Version:" woocommerce-pesaqr/woocommerce-pesaqr.php | head -1 | awk '{print $3}')
+          PACKAGE_VERSION="${{ steps.plugin-version.outputs.version }}"
+          echo "PHP file version: $PHP_VERSION"
+          echo "Package.json version: $PACKAGE_VERSION"
+          if [ "$PHP_VERSION" != "$PACKAGE_VERSION" ]; then
+            echo "❌ Version mismatch! Please run 'node scripts/update-wp-version.js'"
+            exit 1
+          fi
+          echo "✅ Versions match"
+
+      - name: Create plugin zip
+        if: steps.check-tag.outputs.exists == 'false'
+        run: |
+          mkdir -p dist/wordpress-release
+          cd woocommerce-pesaqr
+          zip -r ../dist/wordpress-release/woocommerce-pesaqr-${{ steps.plugin-version.outputs.version }}.zip \
+            woocommerce-pesaqr.php \
+            includes/ \
+            assets/ \
+            README.txt \
+            -x "*.git*" "*.DS_Store" "package.json" "node_modules/*"
+          cd ..
+          echo "✅ Plugin zip created"
+          ls -lh dist/wordpress-release/
+
+      - name: Create Git tag
+        if: steps.check-tag.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "wordpress@${{ steps.plugin-version.outputs.version }}" -m "Release WordPress plugin v${{ steps.plugin-version.outputs.version }}"
+          git push origin "wordpress@${{ steps.plugin-version.outputs.version }}"
+
+      - name: Extract changelog
+        if: steps.check-tag.outputs.exists == 'false'
+        id: changelog
+        run: |
+          if [ -f "woocommerce-pesaqr/CHANGELOG.md" ]; then
+            # Extract the latest version's changelog
+            CHANGELOG=$(awk '/^## / {if (p) exit; p=1; next} p' woocommerce-pesaqr/CHANGELOG.md | sed '/^$/d')
+            if [ -z "$CHANGELOG" ]; then
+              CHANGELOG="Release WordPress plugin version ${{ steps.plugin-version.outputs.version }}"
+            fi
+          else
+            CHANGELOG="Release WordPress plugin version ${{ steps.plugin-version.outputs.version }}"
+          fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: steps.check-tag.outputs.exists == 'false'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: wordpress@${{ steps.plugin-version.outputs.version }}
+          release_name: WordPress Plugin v${{ steps.plugin-version.outputs.version }}
+          body: |
+            ## WooCommerce PesaQR Plugin v${{ steps.plugin-version.outputs.version }}
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ### Installation
+            1. Download `woocommerce-pesaqr-${{ steps.plugin-version.outputs.version }}.zip`
+            2. Go to WordPress Admin → Plugins → Add New → Upload Plugin
+            3. Upload the zip file and activate
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        if: steps.check-tag.outputs.exists == 'false'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/wordpress-release/woocommerce-pesaqr-${{ steps.plugin-version.outputs.version }}.zip
+          asset_name: woocommerce-pesaqr-${{ steps.plugin-version.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - name: Release already exists
+        if: steps.check-tag.outputs.exists == 'true'
+        run: |
+          echo "⚠️ Release wordpress@${{ steps.plugin-version.outputs.version }} already exists"
+          echo "Please bump the version in woocommerce-pesaqr/package.json before releasing"
+          exit 1

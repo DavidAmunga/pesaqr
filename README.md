@@ -7,12 +7,12 @@ A lightweight, framework-agnostic library for generating M-PESA Payment QR codes
 
 ## Features
 
-- 🎯 Generate Payment QR codes for Till Numbers
-- 💳 Generate Payment QR codes for Paybill Numbers
-- 📱 Generate Payment QR codes for Phone Numbers (Send Money)
-- 🔌 Framework agnostic - works with React, Vue, Angular, or vanilla JavaScript
-- 📱 Mobile-responsive
-- 🔒 Offline support
+- Generate Payment QR codes for Till Numbers
+- Generate Payment QR codes for Paybill Numbers
+- Generate Payment QR codes for Phone Numbers (Send Money)
+- Framework agnostic - works with React, Vue, Angular, or vanilla JavaScript
+- Mobile-responsive
+- Offline support
 
 ## Installation
 
@@ -134,9 +134,87 @@ export class AppComponent {}
 - Safari (latest)
 - Opera (latest)
 
+## WordPress Plugin
+
+PesaQR is also available as a WooCommerce plugin! The WordPress plugin displays M-PESA Payment QR codes on WooCommerce product pages and checkout.
+
+### Installation
+
+1. Download the latest release from [GitHub Releases](https://github.com/DavidAmunga/pesaqr/releases)
+2. Go to WordPress Admin → Plugins → Add New → Upload Plugin
+3. Upload the `woocommerce-pesaqr-x.x.x.zip` file
+4. Activate the plugin
+5. Configure your M-PESA details in WooCommerce → Settings → PesaQR
+
+## Development
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/DavidAmunga/pesaqr.git
+cd pesaqr
+
+# Install dependencies
+pnpm install
+
+# Configure WordPress development (optional, for plugin development)
+cp .env.example .env
+# Edit .env with your local WordPress plugins directory path
+
+# Run development server
+pnpm dev
+```
+
+### Building
+
+```bash
+# Build NPM package
+pnpm build
+
+# Build WordPress plugin
+pnpm build:wordpress-plugin
+
+# Sync WordPress plugin to local WordPress installation (requires .env setup)
+pnpm sync
+```
+
+### Release Process
+
+This project uses [changesets](https://github.com/changesets/changesets) for version management with independent versioning:
+
+- **NPM package** (`pesaqr`) - Has its own version and `CHANGELOG.md`
+- **WordPress plugin** (`woocommerce-pesaqr`) - Independent version and `woocommerce-pesaqr/CHANGELOG.md`
+
+#### Creating a Release
+
+1. Make your changes and create a changeset:
+
+   ```bash
+   pnpm changeset
+   # Select which package(s) your changes affect:
+   # - pesaqr (NPM package)
+   # - woocommerce-pesaqr (WordPress plugin)
+   # - or both if the change affects both
+   ```
+
+2. Commit and open a Pull Request
+
+3. Once merged, a "Version Packages" PR will be automatically created with updated changelogs
+
+4. Merge the "Version Packages" PR to bump versions
+
+5. Publish releases via manual GitHub Actions workflows:
+   - **NPM Release**: Actions → Release NPM Package → Run workflow
+   - **WordPress Release**: Actions → Release WordPress Plugin → Run workflow
+
+Each package can be released independently based on its own changelog and version.
+
+For detailed contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our development process and how to submit pull requests.
 
 ## License
 
